@@ -7,31 +7,8 @@ namespace TextersLab
 {
     public class Game
     {
-        public static string playerName;
-
-        static void Prompt(string prompt) // Colors the text every time we ask for player input
-        {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine(prompt);
-            Console.ResetColor();
-        }
-
-        static void Special(string prompt, string color) // Extra prompt options with red/blue/yellow text
-        {
-            if (color == "red")
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-            }
-            else if (color == "blue")
-            {
-                Console.ForegroundColor = ConsoleColor.Blue ;
-            } else if (color == "yellow")
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-            }
-            Console.WriteLine(prompt);
-            Console.ResetColor();
-        }
+        public static string playerName = "";
+        public static bool winGame = false;
 
         public static string StartGame() // Introduce game and get player's name
         {
@@ -44,7 +21,7 @@ namespace TextersLab
             Prompt("What is your name?");
             playerName = Console.ReadLine();
 
-            while (playerName.Length > 30)
+            while (playerName.Length > 30 || playerName.Length == 0)
             {
                 Console.WriteLine("Uh, you go by a nickname?");
                 playerName = Console.ReadLine();
@@ -53,6 +30,22 @@ namespace TextersLab
             Console.WriteLine($"Good luck, {playerName}!\n");
 
             return playerName;
+        }
+
+        public static void PlayGame()
+        {
+            Console.Clear();
+
+            for (int i = 0; i < 30; i++)
+            {
+                Console.WriteLine($"ALL WORK AND NO PLAY MAKES {playerName.ToUpper()} A DULL PLAYER");
+            }
+
+            Thing item1 = new Thing("crowbar", "a staple tool that can do anything but staple", 1, true);
+            Special("You pick up a crowbar and examine it.", "yellow");
+            Console.WriteLine($"It's {item1.desc}.");
+
+            winGame = true;
         }
 
         static void Screen(int selection) // Logo and other art
@@ -77,5 +70,31 @@ namespace TextersLab
             }
 
         }
+
+        static void Prompt(string prompt) // Colors the text every time we ask for player input
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(prompt);
+            Console.ResetColor();
+        }
+
+        static void Special(string prompt, string color) // Extra prompt options with red/blue/yellow text
+        {
+            if (color == "red")
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+            else if (color == "blue")
+            {
+                Console.ForegroundColor = ConsoleColor.Blue;
+            }
+            else if (color == "yellow")
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+            }
+            Console.WriteLine(prompt);
+            Console.ResetColor();
+        }
+
     }
 }

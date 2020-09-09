@@ -11,6 +11,11 @@ namespace TextersLab
 
             Game.StartGame();
 
+            while (!Game.winGame)
+            {
+                Game.PlayGame();
+            }
+
             Console.ReadLine();
         }
 

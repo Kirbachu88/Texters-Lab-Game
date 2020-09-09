@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Kirbachu\\Source\\Repos\\Kirbachu88\\Texters-Lab-Game\\TextersLab\\TextersLab.csproj",
+      "projectUniqueName": "C:\\Users\\Kirbachu\\Source\\Repos\\Texters-Lab-Game\\TextersLab\\TextersLab.csproj",
       "projectName": "TextersLab",
-      "projectPath": "C:\\Users\\Kirbachu\\Source\\Repos\\Kirbachu88\\Texters-Lab-Game\\TextersLab\\TextersLab.csproj",
+      "projectPath": "C:\\Users\\Kirbachu\\Source\\Repos\\Texters-Lab-Game\\TextersLab\\TextersLab.csproj",
       "packagesPath": "C:\\Users\\Kirbachu\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Kirbachu\\Source\\Repos\\Kirbachu88\\Texters-Lab-Game\\TextersLab\\obj\\",
+      "outputPath": "C:\\Users\\Kirbachu\\Source\\Repos\\Texters-Lab-Game\\TextersLab\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Kirbachu\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -58,7 +58,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
       }
     }
   }
