@@ -7,8 +7,9 @@ using System.Text;
 
 namespace TextersLab
 {
-    class Thing
+    public class Thing
     {
+        public const int NOWHERE = -1;
         public string name;
         public string desc;
         public int location;
@@ -31,14 +32,12 @@ namespace TextersLab
             return itemCount;
         }
     }
-    class Room
+    public class Room
     {
-        public const int NDIRS = 10;
-        public const int NOWHERE = -1;
-
+        public const int NDIRS = 10; // N NE E SE S SW W NW UP DOWN
         public string name;
         public string desc;
-        public int[] directions = new int[10];
+        public int[] directions = new int[NDIRS];
 
         public Room(string name, string desc, int[] directions)
         {
@@ -48,7 +47,7 @@ namespace TextersLab
         }
     }
 
-    class Player
+    public class Player
     {
         public int location;
 
@@ -58,7 +57,7 @@ namespace TextersLab
         }
     }
 
-    class Verb
+    public class Verb
     {
         public string word;
         // Not sure what to do here :\
@@ -66,13 +65,7 @@ namespace TextersLab
         public Verb(string word)
         {
             this.word = word;
+            // :\
         }
     }
-
-    // LIST OF THINGS
-
-    // LIST OF ROOMS
-
-    // PLAYER STARTING LOCATION
-    
 }
