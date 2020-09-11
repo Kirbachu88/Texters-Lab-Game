@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using System.Text;
 
@@ -41,9 +42,12 @@ namespace TextersLab
                 Console.WriteLine($"ALL WORK AND NO PLAY MAKES {playerName.ToUpper()} A DULL PLAYER");
             }
 
-            Thing item1 = new Thing("crowbar", "a staple tool that can do anything but staple", 1, true);
-            Special("You pick up a crowbar and examine it.", "yellow");
-            Console.WriteLine($"It's {item1.desc}.");
+            Thing item1 = new Thing("crowbar", "a staple tool that can do anything but staple", 1, true, Thing.itemCount);
+            Thing item2 = new Thing("hammer", "like a crowbar, but with a thing at the end", 1, true, Thing.itemCount);
+            Special($"You pick up the {item1.name} and examine it.", "yellow");
+            Console.WriteLine($"It's {item1.desc}.\nStrangely, you get the feeling its item ID is {item1.itemID}.");
+            Special($"You pick up the {item2.name} and examine it.", "yellow");
+            Console.WriteLine($"It's {item2.desc}.\nStrangely, you get the feeling its item ID is {item2.itemID}.\nAlso strangely, there are {Thing.itemCount} things in the area.");
 
             winGame = true;
         }

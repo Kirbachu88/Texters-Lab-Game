@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace TextersLab
@@ -12,31 +13,66 @@ namespace TextersLab
         public string desc;
         public int location;
         public bool cantake;
+        public int itemID;
+        public static int itemCount;
 
-        public Thing(string aName, string aDesc, int aLocation, bool aCantake)
+        public Thing(string name, string desc, int location, bool cantake, int itemID)
         {
-            name = aName;
-            desc = aDesc;
-            location = aLocation;
-            cantake = aCantake;
+            this.name = name;
+            this.desc = desc;
+            this.location = location;
+            this.cantake = cantake;
+            this.itemID = itemID++;
+            itemCount++;
+        } // sort of understanding this.now not really
+
+        public int getItemCount()
+        {
+            return itemCount;
         }
     }
     class Room
     {
+        public const int NDIRS = 10;
+        public const int NOWHERE = -1;
+
         public string name;
         public string desc;
         public int[] directions = new int[10];
 
-        public Room(string aName, string aDesc, int[] aDirections)
+        public Room(string name, string desc, int[] directions)
         {
-            name = aName;
-            desc = aDesc;
-            directions = aDirections;
+            this.name = name;
+            this.desc = desc;
+            this.directions = directions;
         }
     }
 
     class Player
     {
         public int location;
+
+        public Player(int location)
+        {
+            this.location = location;
+        }
     }
+
+    class Verb
+    {
+        public string word;
+        // Not sure what to do here :\
+
+        public Verb(string word)
+        {
+            this.word = word;
+        }
+    }
+
+    // LIST OF THINGS
+
+    // LIST OF ROOMS
+
+    // PLAYER STARTING LOCATION
+    
 }
