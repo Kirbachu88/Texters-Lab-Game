@@ -12,6 +12,7 @@ namespace TextersLab
         public static Player player = new Player(1); // Player in starting room
         public static string playerName = "";
         public static bool winGame = false;
+        public static Dictionary<int, Room> roomPairs = new Dictionary<int, Room>();
 
         public static string StartGame() // Introduce game and get player's name
         {
@@ -39,9 +40,11 @@ namespace TextersLab
 
         public static void PlayGame()
         {
+            Rooms(roomPairs);
+
             do
             {
-                string input = Console.ReadLine();
+                string input = Console.ReadLine().ToLower();
                 GetInput(input);
                 DoCommand(input);
             } while (!winGame);
@@ -50,15 +53,20 @@ namespace TextersLab
         // LIST OF THINGS
         public static Thing item1 = new Thing("crowbar", "a bent metal stick", 2, true, Thing.itemCount);
 
-        // LIST OF ROOMS
-        public static Room inv = new Room("player inv", "", 
+        public static void Rooms(Dictionary<int, Room> roomPairs)
+        {
+            Room inv = new Room("player inv", "",
             new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
-        public static Room room1 = new Room("Entrance", 
-            "some place", 
+            Room room1 = new Room("Entrance","some place",
             new int[] { 2, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
-        public static Room room2 = new Room("Not Entrance", 
-            "some other place", 
+            Room room2 = new Room("Not Entrance",
+            "some other place",
             new int[] { -1, -1, -1, -1, 1, -1, -1, -1, -1, -1 });
+
+            roomPairs.Add(0, inv);
+            roomPairs.Add(1, room1);
+            roomPairs.Add(2, room2);
+        }
 
         static void Screen(int selection) // Logo and other art
         {
@@ -110,39 +118,40 @@ namespace TextersLab
         {
 
         }
-        static void Look(Room room)
+        public static void Look(Dictionary<int, Room> roomPairs)
         {
-            Console.WriteLine(room.name);
+            int location = player.location;
+            Console.WriteLine(roomPairs[location].desc);
         }
 
-        static void Go(Room room, int dirs) // Moving from room to room
+        static void Go(int dirs) // Moving from room to room
         {
-            int newLocation = 0;
+            int newLocation = 0; // TODO: Big brain how to get the new location number so we can't go to -1 rooms
 
             for (int d = dirs; d != -1; d = newLocation)
             {
-                newLocation = room.directions[dirs];
+                newLocation = dirs;
                 if (newLocation == -1)
                 {
                     Console.WriteLine("You can't go that way.");
                 }
                 else
                 {
-                    player.location = room.directions[dirs];
-                    Look(room);
+                    player.location = roomPairs[player.location].directions[dirs];
+                    Look(roomPairs);
                     break;
                 }
             }
         }
-        static void goNorth(Room room, int dirs)
+        static void goNorth()
         {
-            dirs = 0; // Hmm...
-            Go(room, dirs);
+            int dirs = 0; // Hmm...
+            Go(dirs);
         }
-        static void goSouth(Room room, int dirs)
+        static void goSouth()
         {
-            dirs = 5; // Hmm...
-            Go(room, dirs);
+            int dirs = 4; // Hmm...
+            Go(dirs);
         }
 
         static void DoInv(Room room, int[] item)
@@ -202,10 +211,10 @@ namespace TextersLab
             switch (dirs)
             { // Going to very responsibly figure this out later
                 case "north":
-                    Go(room1, 0);
+                    goNorth();
                     break;
                 case "south":
-                    Go(room2, 4);
+                    goSouth();
                     break;
                 default:
                     Console.WriteLine("Where are you going?");
