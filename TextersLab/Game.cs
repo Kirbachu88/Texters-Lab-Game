@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.CompilerServices;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -9,10 +11,13 @@ namespace TextersLab
 {
     public class Game
     {
+        public const int NOWHERE = -1;
         public static Player player = new Player(1); // Player in starting room
         public static string playerName = "";
         public static bool winGame = false;
-        public static Dictionary<int, Room> roomPairs = new Dictionary<int, Room>();
+        static Dictionary<string, Thing> itemNames = new Dictionary<string, Thing>();
+        static Dictionary<int, Thing> itemPairs = new Dictionary<int, Thing>();
+        static Dictionary<int, Room> roomPairs = new Dictionary<int, Room>();
 
         public static string StartGame() // Introduce game and get player's name
         {
@@ -22,7 +27,7 @@ namespace TextersLab
             Console.ReadLine();
 
             Console.WriteLine("Let's get to know more about you.");
-            Prompt("What is your name?");
+            Special("What is your name?");
             playerName = Console.ReadLine();
 
             while (playerName.Length > 30 || playerName.Length == 0)
@@ -40,6 +45,7 @@ namespace TextersLab
 
         public static void PlayGame()
         {
+            Items(itemPairs);
             Rooms(roomPairs);
 
             do
@@ -48,24 +54,6 @@ namespace TextersLab
                 GetInput(input);
                 DoCommand(input);
             } while (!winGame);
-        }
-
-        // LIST OF THINGS
-        public static Thing item1 = new Thing("crowbar", "a bent metal stick", 2, true, Thing.itemCount);
-
-        public static void Rooms(Dictionary<int, Room> roomPairs)
-        {
-            Room inv = new Room("player inv", "",
-            new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
-            Room room1 = new Room("Entrance","some place",
-            new int[] { 2, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
-            Room room2 = new Room("Not Entrance",
-            "some other place",
-            new int[] { -1, -1, -1, -1, 1, -1, -1, -1, -1, -1 });
-
-            roomPairs.Add(0, inv);
-            roomPairs.Add(1, room1);
-            roomPairs.Add(2, room2);
         }
 
         static void Screen(int selection) // Logo and other art
@@ -90,13 +78,8 @@ namespace TextersLab
             }
 
         }
-        static void Prompt(string prompt) // Colors the text every time we ask for player input
-        {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine(prompt);
-            Console.ResetColor();
-        }
-        static void Special(string prompt, string color) // Extra prompt options with red/blue/yellow text
+
+        static void Special(string prompt, string color = "cyan") // Color text (cyan default) with extra prompt options with red/blue/yellow text
         {
             if (color == "red")
             {
@@ -110,18 +93,26 @@ namespace TextersLab
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
             }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+            }
             Console.WriteLine(prompt);
             Console.ResetColor();
         }
 
-        static void Inv(Room room, int location)
+        static void Inv(int area = -1)
         {
 
         }
-        public static void Look(Dictionary<int, Room> roomPairs)
+        public static void Look() // Look without a specific target
         {
             int location = player.location;
             Console.WriteLine(roomPairs[location].desc);
+        }
+        public static void Look(string item) // Look at target
+        {
+
         }
 
         static void Go(int dirs) // Moving from room to room
@@ -138,7 +129,7 @@ namespace TextersLab
                 else
                 {
                     player.location = roomPairs[player.location].directions[dirs];
-                    Look(roomPairs);
+                    Look();
                     break;
                 }
             }
@@ -154,35 +145,29 @@ namespace TextersLab
             Go(dirs);
         }
 
-        static void DoInv(Room room, int[] item)
+        static void DoInv()
         {
-            Inv(room, 0);
+            Inv(); // TODO: More big brain
         }
-        static void Take(Thing item)
+        static void Take(string item)
         {
-            int i = 0;
-            string itemName;
-            int itemLocation;
-            bool itemTake;
+            Thing target = itemNames[item];
+            string itemName = target.name;
+            int itemLocation = target.location;
+            bool itemTake = target.cantake;
 
-            for (i = item.itemID; i >= 0; i++)
+            if (player.location != itemLocation)
             {
-                itemName = item.name;
-                itemLocation = item.location;
-                itemTake = item.cantake;
-
-                if (player.location != itemLocation)
-                {
-                    Console.WriteLine("Don't see anything like that here");
-                    continue;
-                }
-                if (!itemTake)
-                {
-                    Console.WriteLine("Can't carry that");
-                    continue;
-                }
-                item.location = 0;
-                Console.WriteLine("Taken.");
+                Console.WriteLine("Don't see that here.");
+            }
+            else if (!itemTake)
+            {
+                Console.WriteLine("Can't carry that!");
+            }
+            else
+            {
+                target.location = 0;
+                Special($"Took the {itemName}.");
             }
         }
 
@@ -195,6 +180,9 @@ namespace TextersLab
             {
                 case "go":
                     GoParse(words[1]);
+                    break;
+                case "take": case "get":
+                    Take(words[1]);
                     break;
                 default:
                     Console.WriteLine("What?");
@@ -220,6 +208,58 @@ namespace TextersLab
                     Console.WriteLine("Where are you going?");
                     break;
             }
+        }
+        public static void Items(Dictionary<int, Thing> itemPairs)
+        {
+            // LIST OF DIRECTIONS
+            Thing dir0 = new Thing("north",     "", NOWHERE, false);
+            Thing dir1 = new Thing("northeast", "", NOWHERE, false);
+            Thing dir2 = new Thing("east",      "", NOWHERE, false);
+            Thing dir3 = new Thing("southeast", "", NOWHERE, false);
+            Thing dir4 = new Thing("south",     "", NOWHERE, false);
+            Thing dir5 = new Thing("southwest", "", NOWHERE, false);
+            Thing dir6 = new Thing("west",      "", NOWHERE, false);
+            Thing dir7 = new Thing("northwest", "", NOWHERE, false);
+            Thing dir8 = new Thing("up",        "", NOWHERE, false);
+            Thing dir9 = new Thing("down",      "", NOWHERE, false);
+
+            // LIST OF ITEMS
+            Thing item1 = new Thing("crowbar", "a bent metal stick", 2, true);
+            Thing item2 = new Thing("crate", "a large wooden box", 1, false);
+
+            itemPairs.Add(0, dir0);
+            itemPairs.Add(1, dir1);
+            itemPairs.Add(2, dir2);
+            itemPairs.Add(3, dir3);
+            itemPairs.Add(4, dir4);
+            itemPairs.Add(5, dir5);
+            itemPairs.Add(6, dir6);
+            itemPairs.Add(7, dir7);
+            itemPairs.Add(8, dir8);
+            itemPairs.Add(9, dir9);
+
+            // Items by number
+            itemPairs.Add(10, item1);
+            itemPairs.Add(11, item2);
+
+            // Items by name
+            itemNames.Add("crowbar", item1);
+            itemNames.Add("crate", item2);
+        }
+        public static void Rooms(Dictionary<int, Room> roomPairs)
+        {
+            // LIST OF ROOMS
+            Room inv = new Room("player inv", "",
+            new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
+            Room room1 = new Room("Entrance", "some place",
+            new int[] { 2, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
+            Room room2 = new Room("Not Entrance",
+            "some other place",
+            new int[] { -1, -1, -1, -1, 1, -1, -1, -1, -1, -1 });
+
+            roomPairs.Add(0, inv);
+            roomPairs.Add(1, room1);
+            roomPairs.Add(2, room2);
         }
     }
 }

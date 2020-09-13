@@ -9,7 +9,6 @@ namespace TextersLab
 {
     public class Thing
     {
-        public const int NOWHERE = -1;
         public string name;
         public string desc;
         public int location;
@@ -17,14 +16,13 @@ namespace TextersLab
         public int itemID;
         public static int itemCount;
 
-        public Thing(string name, string desc, int location, bool cantake, int itemID)
+        public Thing(string name, string desc, int location, bool cantake)
         {
             this.name = name;
             this.desc = desc;
             this.location = location;
             this.cantake = cantake;
-            this.itemID = itemID++;
-            itemCount++;
+            this.itemID = itemCount++;
         } // sort of understanding this.now not really
 
         public int getItemCount()
