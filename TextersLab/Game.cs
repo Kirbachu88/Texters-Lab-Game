@@ -47,12 +47,15 @@ namespace TextersLab
         {
             Items(itemPairs);
             Rooms(roomPairs);
+            Special("Type in commands and hit ENTER to continue."); // TODO: Make a HELP command
 
             do
             {
+                Console.Write(">");
                 string input = Console.ReadLine().ToLower();
                 GetInput(input);
                 DoCommand(input);
+                Console.WriteLine();
             } while (!winGame);
         }
 
@@ -103,46 +106,34 @@ namespace TextersLab
 
         static void Inv(int area = -1)
         {
-
+            // Give list of player's inventory OR items in room
         }
-        public static void Look() // Look without a specific target
+        public static void Look() // No target, look at room and items within
         {
             int location = player.location;
             Console.WriteLine(roomPairs[location].desc);
         }
         public static void Look(string item) // Look at target
         {
-
+            if (item == "inventory" || item == "inv")
+            {
+                Inv();
+            }
+            Console.WriteLine("It's pitch-black, you use echolocation to find things.");
         }
 
         static void Go(int dirs) // Moving from room to room
         {
-            int newLocation = 0; // TODO: Big brain how to get the new location number so we can't go to -1 rooms
-
-            for (int d = dirs; d != -1; d = newLocation)
+            int newLocation = roomPairs[player.location].directions[dirs]; // TODO: Big brain how to get the new location number so we can't go to -1 rooms
+            if (newLocation == -1)
             {
-                newLocation = dirs;
-                if (newLocation == -1)
-                {
-                    Console.WriteLine("You can't go that way.");
-                }
-                else
-                {
-                    player.location = roomPairs[player.location].directions[dirs];
-                    Look();
-                    break;
-                }
+                Console.WriteLine("You can't go that way.");
             }
-        }
-        static void goNorth()
-        {
-            int dirs = 0; // Hmm...
-            Go(dirs);
-        }
-        static void goSouth()
-        {
-            int dirs = 4; // Hmm...
-            Go(dirs);
+            else
+            {
+                player.location = newLocation;
+                Look();
+            }
         }
 
         static void DoInv()
@@ -150,44 +141,65 @@ namespace TextersLab
             Inv(); // TODO: More big brain
         }
         static void Take(string item)
-        {
-            Thing target = itemNames[item];
-            string itemName = target.name;
-            int itemLocation = target.location;
-            bool itemTake = target.cantake;
+        { // TOFIX: Player entering item name that does not exist
+            try
+            {
+                Thing target = itemNames[item];
+                string itemName = target.name;
+                int itemLocation = target.location;
+                bool itemTake = target.cantake;
 
-            if (player.location != itemLocation)
+                if (player.location != itemLocation)
+                {
+                    Console.WriteLine("Don't see that here.");
+                }
+                else if (!itemTake)
+                {
+                    Console.WriteLine("Can't carry that!");
+                }
+                else
+                {
+                    target.location = 0;
+                    Special($"Took the {itemName}.");
+                }
+            }
+            catch
             {
                 Console.WriteLine("Don't see that here.");
-            }
-            else if (!itemTake)
-            {
-                Console.WriteLine("Can't carry that!");
-            }
-            else
-            {
-                target.location = 0;
-                Special($"Took the {itemName}.");
             }
         }
 
         static void GetInput(string input)
-        { // Learn regex
-            // string command;
-            // Console.WriteLine("\n");
+        { // TODO: Learn regex or XML
             string[] words = input.Split(' ');
-            switch (words[0])
+            if (words.Length > 1)
             {
-                case "go":
-                    GoParse(words[1]);
-                    break;
-                case "take": case "get":
-                    Take(words[1]);
-                    break;
-                default:
-                    Console.WriteLine("What?");
-                    break;
+                switch (words[0])
+                {
+                    case "look":
+                        Look(words[1]);
+                        break;
+                    case "go":
+                        GoParse(words[1]);
+                        break;
+                    case "take": case "get":
+                        Take(words[1]);
+                        break;
+                    default:
+                        Console.WriteLine("What?");
+                        break;
+                }
             }
+            else // Player enters one word only
+            {
+                switch (words[0])
+                {
+                    default:
+                        Console.WriteLine("What?");
+                        break;
+                }
+            }
+
         }
         static void DoCommand(string command)
         {
@@ -197,12 +209,36 @@ namespace TextersLab
         static void GoParse(string dirs)
         {
             switch (dirs)
-            { // Going to very responsibly figure this out later
+            {
                 case "north":
-                    goNorth();
+                    Go(0);
+                    break;
+                case "northeast":
+                    Go(1);
+                    break;
+                case "east":
+                    Go(2);
+                    break;
+                case "southeast":
+                    Go(3);
                     break;
                 case "south":
-                    goSouth();
+                    Go(4);
+                    break;
+                case "southwest":
+                    Go(5);
+                    break;
+                case "west":
+                    Go(6);
+                    break;
+                case "northwest":
+                    Go(7);
+                    break;
+                case "up":
+                    Go(8);
+                    break;
+                case "down":
+                    Go(9);
                     break;
                 default:
                     Console.WriteLine("Where are you going?");
