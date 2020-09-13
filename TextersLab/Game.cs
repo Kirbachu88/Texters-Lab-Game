@@ -1,23 +1,20 @@
-﻿using Microsoft.VisualBasic.CompilerServices;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Reflection;
-using System.Text;
-using System.Threading;
 
 namespace TextersLab
 {
     public class Game
     {
-        public const int NOWHERE = -1;
-        public static Player player = new Player(1); // Player in starting room
-        public static string playerName = "";
-        public static bool winGame = false;
+        const int NOWHERE = -1;
+        const string DIRSLIST =
+            "n ne e se s sw w nw up down" +
+            "north northeast east southeast south southwest west northwest";
         static Dictionary<string, Thing> itemNames = new Dictionary<string, Thing>();
         static Dictionary<int, Thing> itemPairs = new Dictionary<int, Thing>();
         static Dictionary<int, Room> roomPairs = new Dictionary<int, Room>();
+        public static Player player = new Player(1); // Player in starting room
+        public static string playerName = "";
+        public static bool winGame = false;
 
         public static string StartGame() // Introduce game and get player's name
         {
@@ -40,21 +37,18 @@ namespace TextersLab
             Console.ReadLine();
             Console.Clear();
 
-            return playerName;
-        }
-
-        public static void PlayGame()
-        {
             Items(itemPairs);
             Rooms(roomPairs);
             Special("Type in commands and hit ENTER to continue."); // TODO: Make a HELP command
-
+            return playerName;
+        }
+        public static void PlayGame()
+        {
             do
             {
                 Console.Write(">");
                 string input = Console.ReadLine().ToLower();
                 GetInput(input);
-                DoCommand(input);
                 Console.WriteLine();
             } while (!winGame);
         }
@@ -81,7 +75,6 @@ namespace TextersLab
             }
 
         }
-
         static void Special(string prompt, string color = "cyan") // Color text (cyan default) with extra prompt options with red/blue/yellow text
         {
             if (color == "red")
@@ -113,9 +106,9 @@ namespace TextersLab
             int location = player.location;
             Console.WriteLine(roomPairs[location].desc);
         }
-        public static void Look(string item) // Look at target
+        public static void Look(string[] target) // Look at target
         {
-            if (item == "inventory" || item == "inv")
+            if (target[1] == "inventory" || target[1] == "inv")
             {
                 Inv();
             }
@@ -124,7 +117,7 @@ namespace TextersLab
 
         static void Go(int dirs) // Moving from room to room
         {
-            int newLocation = roomPairs[player.location].directions[dirs]; // TODO: Big brain how to get the new location number so we can't go to -1 rooms
+            int newLocation = roomPairs[player.location].directions[dirs];
             if (newLocation == -1)
             {
                 Console.WriteLine("You can't go that way.");
@@ -177,10 +170,10 @@ namespace TextersLab
                 switch (words[0])
                 {
                     case "look":
-                        Look(words[1]);
+                        Look(words);
                         break;
                     case "go":
-                        GoParse(words[1]);
+                        GoParse(words);
                         break;
                     case "take": case "get":
                         Take(words[1]);
@@ -194,44 +187,52 @@ namespace TextersLab
             {
                 switch (words[0])
                 {
+                    case "inventory": case "inv":
+                        Inv();
+                        break;
+                    case "look":
+                        Look();
+                        break;
                     default:
-                        Console.WriteLine("What?");
+                        GoParse(words); // Player enters "N" or "North" only
                         break;
                 }
             }
-
         }
-        static void DoCommand(string command)
-        {
-            
-        }
-
-        static void GoParse(string dirs)
-        {
-            switch (dirs)
+        static void GoParse(string[] dirs)
+        { // Look for directions in player's input
+            string parsedDirs = "";
+            for (int i = 0; i < dirs.Length ; i++)
             {
-                case "north":
+                if (DIRSLIST.Contains(dirs[i]))
+                {
+                    parsedDirs = dirs[i];
+                }
+            }
+            switch (parsedDirs)
+            {
+                case "n": case "north":
                     Go(0);
                     break;
-                case "northeast":
+                case "ne": case "northeast":
                     Go(1);
                     break;
-                case "east":
+                case "e": case "east":
                     Go(2);
                     break;
-                case "southeast":
+                case "se": case "southeast":
                     Go(3);
                     break;
-                case "south":
+                case "s": case "south":
                     Go(4);
                     break;
-                case "southwest":
+                case "sw": case "southwest":
                     Go(5);
                     break;
-                case "west":
+                case "w": case "west":
                     Go(6);
                     break;
-                case "northwest":
+                case "nw": case "northwest":
                     Go(7);
                     break;
                 case "up":
@@ -241,7 +242,7 @@ namespace TextersLab
                     Go(9);
                     break;
                 default:
-                    Console.WriteLine("Where are you going?");
+                    Console.WriteLine("What?");
                     break;
             }
         }

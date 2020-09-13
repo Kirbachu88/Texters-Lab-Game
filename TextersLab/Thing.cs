@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 
 namespace TextersLab
 {
