@@ -5,6 +5,7 @@ namespace TextersLab
 {
     public class Game
     {
+        #region Lists and conditions
         const int NOWHERE = -1;
         const string DIRSLIST =
             "n ne e se s sw w nw up down" +
@@ -15,7 +16,9 @@ namespace TextersLab
         public static Player player = new Player(1); // Player in starting room
         public static string playerName = "";
         public static bool winGame = false;
+        #endregion
 
+        #region Gameplay
         public static string StartGame() // Introduce game and get player's name
         {
             Screen(0);
@@ -52,89 +55,88 @@ namespace TextersLab
                 Console.WriteLine();
             } while (!winGame);
         }
-
-        static void Screen(int selection) // Logo and other art
-        {
-            if (selection == 0)
+        static void GetInput(string input) // Determine which command to use
+        { // TODO: Learn regex or XML
+            string[] words = input.Split(' ');
+            if (words.Length > 1)
             {
-                Console.Title = "Texter's Lab";
-                Console.ForegroundColor = ConsoleColor.Blue;
-                string logo = @"
-  _____         _            _       _          _      
- |_   _|____  _| |_ ___ _ __( )___  | |    __ _| |__   
-   | |/ _ \ \/ / __/ _ \ '__|// __| | |   / _` | '_ \  
-   | |  __/>  <| ||  __/ |    \__ \ | |__| (_| | |_) | 
-   |_|\___/_/\_\\__\___|_|    |___/ |_____\__,_|_.__/  
-                                                       ";
-                Console.WriteLine(logo);
-                Console.ResetColor();
+                switch (words[0])
+                {
+                    case "look":
+                    case "check":
+                    case "examine":
+                        Look(words);
+                        break;
+                    case "go":
+                        GoParse(words);
+                        break;
+                    case "take":
+                    case "get":
+                        Take(words[1]);
+                        break;
+                    default:
+                        Console.WriteLine("What?");
+                        break;
+                }
             }
-            else
+            else // Player enters one word only
             {
-                Console.Title = "Placeholder Title";
+                switch (words[0])
+                {
+                    case "inventory":
+                    case "inv":
+                        DoInv();
+                        break;
+                    case "look":
+                        Look();
+                        break;
+                    default:
+                        GoParse(words); // Player enters "N" or "North" only
+                        break;
+                }
             }
-
         }
-        static void Special(string prompt, string color = "cyan") // Color text (cyan default) with extra prompt options with red/blue/yellow text
-        {
-            if (color == "red")
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-            }
-            else if (color == "blue")
-            {
-                Console.ForegroundColor = ConsoleColor.Blue;
-            }
-            else if (color == "yellow")
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-            }
-            Console.WriteLine(prompt);
-            Console.ResetColor();
-        }
+        #endregion
 
-        static void Inv(int area = -1)
+        #region Item-related
+        static void DoInv()
         {
-            // Give list of player's inventory OR items in room
+            Special("You're carrying:", "yellow");
+            Inv(); // TODO: More big brain
         }
-        public static void Look() // No target, look at room and items within
+        static void Inv(int area = 0)
         {
-            int location = player.location;
-            Console.WriteLine(roomPairs[location].desc);
+            int check = 0;
+            for (int i = 0;  i < itemPairs.Count; i++)
+            {
+                if (itemPairs[i].location == area)
+                {
+                    Console.WriteLine("A " + itemPairs[i].name);
+                    check++;
+                }
+            }
+            if (check == 0)
+            {
+                if (area > 0)
+                {
+                    Console.WriteLine("There's nothing else of interest here.");
+                }
+                else
+                {
+                    Console.WriteLine("Nothing!");
+                }
+            }
+        }
+        public static void Look()
+        {
+
         }
         public static void Look(string[] target) // Look at target
         {
-            if (target[1] == "inventory" || target[1] == "inv")
-            {
-                Inv();
-            }
-            Console.WriteLine("It's pitch-black, you use echolocation to find things.");
-        }
-
-        static void Go(int dirs) // Moving from room to room
-        {
-            int newLocation = roomPairs[player.location].directions[dirs];
-            if (newLocation == -1)
-            {
-                Console.WriteLine("You can't go that way.");
-            }
-            else
-            {
-                player.location = newLocation;
-                Look();
-            }
-        }
-
-        static void DoInv()
-        {
-            Inv(); // TODO: More big brain
+            Inv(player.location);
         }
         static void Take(string item)
-        { // TOFIX: Player entering item name that does not exist
+        {
             try
             {
                 Thing target = itemNames[item];
@@ -153,7 +155,7 @@ namespace TextersLab
                 else
                 {
                     target.location = 0;
-                    Special($"Took the {itemName}.");
+                    Special($"Took the {itemName}.", "yellow");
                 }
             }
             catch
@@ -161,43 +163,40 @@ namespace TextersLab
                 Console.WriteLine("Don't see that here.");
             }
         }
+        public static void Items(Dictionary<int, Thing> itemPairs)
+        {
+            // LIST OF ITEMS
+            Thing item1 = new Thing("crowbar", "a bent metal stick", 2, true);
+            Thing item2 = new Thing("crate", "a large wooden box", 1, false);
 
-        static void GetInput(string input)
-        { // TODO: Learn regex or XML
-            string[] words = input.Split(' ');
-            if (words.Length > 1)
+            // Items by number
+            itemPairs.Add(0, item1);
+            itemPairs.Add(1, item2);
+
+            // Items by name
+            itemNames.Add("crowbar", item1);
+            itemNames.Add("crate", item2);
+        }
+        #endregion
+
+        #region Navigation
+        static void Go(int dirs) // Moving from room to room
+        {
+            int newLocation = roomPairs[player.location].directions[dirs];
+            if (newLocation == -1)
             {
-                switch (words[0])
-                {
-                    case "look":
-                        Look(words);
-                        break;
-                    case "go":
-                        GoParse(words);
-                        break;
-                    case "take": case "get":
-                        Take(words[1]);
-                        break;
-                    default:
-                        Console.WriteLine("What?");
-                        break;
-                }
+                Console.WriteLine("You can't go that way.");
             }
-            else // Player enters one word only
+            else
             {
-                switch (words[0])
-                {
-                    case "inventory": case "inv":
-                        Inv();
-                        break;
-                    case "look":
-                        Look();
-                        break;
-                    default:
-                        GoParse(words); // Player enters "N" or "North" only
-                        break;
-                }
+                player.location = newLocation;
+                GoLook();
             }
+        }
+        static void GoLook() // Navigation only
+        {
+            int location = player.location;
+            Console.WriteLine($"Location: {roomPairs[location].desc}");
         }
         static void GoParse(string[] dirs)
         { // Look for directions in player's input
@@ -246,43 +245,6 @@ namespace TextersLab
                     break;
             }
         }
-        public static void Items(Dictionary<int, Thing> itemPairs)
-        {
-            // LIST OF DIRECTIONS
-            Thing dir0 = new Thing("north",     "", NOWHERE, false);
-            Thing dir1 = new Thing("northeast", "", NOWHERE, false);
-            Thing dir2 = new Thing("east",      "", NOWHERE, false);
-            Thing dir3 = new Thing("southeast", "", NOWHERE, false);
-            Thing dir4 = new Thing("south",     "", NOWHERE, false);
-            Thing dir5 = new Thing("southwest", "", NOWHERE, false);
-            Thing dir6 = new Thing("west",      "", NOWHERE, false);
-            Thing dir7 = new Thing("northwest", "", NOWHERE, false);
-            Thing dir8 = new Thing("up",        "", NOWHERE, false);
-            Thing dir9 = new Thing("down",      "", NOWHERE, false);
-
-            // LIST OF ITEMS
-            Thing item1 = new Thing("crowbar", "a bent metal stick", 2, true);
-            Thing item2 = new Thing("crate", "a large wooden box", 1, false);
-
-            itemPairs.Add(0, dir0);
-            itemPairs.Add(1, dir1);
-            itemPairs.Add(2, dir2);
-            itemPairs.Add(3, dir3);
-            itemPairs.Add(4, dir4);
-            itemPairs.Add(5, dir5);
-            itemPairs.Add(6, dir6);
-            itemPairs.Add(7, dir7);
-            itemPairs.Add(8, dir8);
-            itemPairs.Add(9, dir9);
-
-            // Items by number
-            itemPairs.Add(10, item1);
-            itemPairs.Add(11, item2);
-
-            // Items by name
-            itemNames.Add("crowbar", item1);
-            itemNames.Add("crate", item2);
-        }
         public static void Rooms(Dictionary<int, Room> roomPairs)
         {
             // LIST OF ROOMS
@@ -298,5 +260,52 @@ namespace TextersLab
             roomPairs.Add(1, room1);
             roomPairs.Add(2, room2);
         }
+        #endregion
+
+        #region Visuals
+        static void Screen(int selection) // Logo and other art
+        {
+            if (selection == 0)
+            {
+                Console.Title = "Texter's Lab";
+                Console.ForegroundColor = ConsoleColor.Blue;
+                string logo = @"
+  _____         _            _       _          _      
+ |_   _|____  _| |_ ___ _ __( )___  | |    __ _| |__   
+   | |/ _ \ \/ / __/ _ \ '__|// __| | |   / _` | '_ \  
+   | |  __/>  <| ||  __/ |    \__ \ | |__| (_| | |_) | 
+   |_|\___/_/\_\\__\___|_|    |___/ |_____\__,_|_.__/  
+                                                       ";
+                Console.WriteLine(logo);
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.Title = "Placeholder Title";
+            }
+
+        }
+        static void Special(string prompt, string color = "cyan") // Color text (cyan default) with extra prompt options with red/blue/yellow text
+        {
+            if (color == "red")
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+            else if (color == "blue")
+            {
+                Console.ForegroundColor = ConsoleColor.Blue;
+            }
+            else if (color == "yellow")
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+            }
+            Console.WriteLine(prompt);
+            Console.ResetColor();
+        }
+        #endregion
     }
 }
