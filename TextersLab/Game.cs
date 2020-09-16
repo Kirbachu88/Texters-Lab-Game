@@ -62,16 +62,13 @@ namespace TextersLab
             {
                 switch (words[0])
                 {
-                    case "look":
-                    case "check":
-                    case "examine":
+                    case "look": case "check": case "examine":
                         Look(words);
                         break;
                     case "go":
                         GoParse(words);
                         break;
-                    case "take":
-                    case "get":
+                    case "take": case "get": case "grab":
                         Take(words[1]);
                         break;
                     default:
@@ -127,13 +124,53 @@ namespace TextersLab
                 }
             }
         }
-        public static void Look()
+        public static void Look() // If there's no look target, examine room
         {
-
+            string[] lookDefault = {"room"};
+            Look(lookDefault);
         }
         public static void Look(string[] target) // Look at target
         {
-            Inv(player.location);
+            bool check = false;
+            for (int i = 0; i < target.Length; i++)
+            {
+                if (check) // TODO: Fix the item description repeating itself so I don't have to do this check.
+                {
+                    break;
+                }
+                switch (target[i])
+                {
+                    case "room": case "area": case "around":
+                        check = true;
+                        Inv(player.location);
+                        break;
+                    default: // Check if the player typed an item name
+                        for (int j = 0; j < itemPairs.Count; j++)
+                        {
+                            for (int k = 0; k < target.Length; k++)
+                            {
+                                if (itemPairs[j].name == target[k])
+                                {
+                                    check = true;
+                                    if (itemPairs[j].location == player.location || itemPairs[j].location == 0)
+                                    {
+                                        Console.WriteLine("It's " + itemPairs[j].desc);
+                                        break; // Look at one item at a time, hopefully.
+                                    }
+                                    else // Item exists, but is not in the immediate area. TODO: Combine these two "default" messages?
+                                    {
+                                        Console.WriteLine("Don't see anything like that here.");
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                }
+            } // Check if the player typed gibberish
+            if (!check)
+            {
+                Console.WriteLine("Don't see anything like that here.");
+            }
         }
         static void Take(string item)
         {
