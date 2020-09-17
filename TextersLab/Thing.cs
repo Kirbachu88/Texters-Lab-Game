@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TextersLab
+﻿namespace TextersLab
 {
     public class Thing
     {

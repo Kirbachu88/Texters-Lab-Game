@@ -5,7 +5,7 @@ namespace TextersLab
 {
     public class Game
     {
-        #region Lists and conditions
+        #region List Declaration and Game Conditions
         const int NOWHERE = -1;
         const string DIRSLIST =
             "n ne e se s sw w nw up down" +
@@ -13,6 +13,7 @@ namespace TextersLab
         static Dictionary<string, Thing> itemNames = new Dictionary<string, Thing>();
         static Dictionary<int, Thing> itemPairs = new Dictionary<int, Thing>();
         static Dictionary<int, Room> roomPairs = new Dictionary<int, Room>();
+
         public static Player player = new Player(1); // Player in starting room
         public static string playerName = "";
         public static bool winGame = false;
@@ -55,6 +56,9 @@ namespace TextersLab
                 Console.WriteLine();
             } while (!winGame);
         }
+        #endregion
+
+        #region Keywords
         static void GetInput(string input) // Determine which command to use
         { // TODO: Learn regex or XML
             string[] words = input.Split(' ');
@@ -62,13 +66,17 @@ namespace TextersLab
             {
                 switch (words[0])
                 {
-                    case "look": case "check": case "examine":
+                    case "look":
+                    case "check":
+                    case "examine":
                         Look(words);
                         break;
                     case "go":
                         GoParse(words);
                         break;
-                    case "take": case "get": case "grab":
+                    case "take":
+                    case "get":
+                    case "grab":
                         Take(words[1]);
                         break;
                     default:
@@ -78,6 +86,7 @@ namespace TextersLab
             }
             else // Player enters one word only
             {
+                string[] defaultWords = { "foo", "bar" };
                 switch (words[0])
                 {
                     case "inventory":
@@ -87,6 +96,8 @@ namespace TextersLab
                     case "look":
                         Look();
                         break;
+                    /* case "take":
+                        Take(defaultWords); */
                     default:
                         GoParse(words); // Player enters "N" or "North" only
                         break;
@@ -95,26 +106,26 @@ namespace TextersLab
         }
         #endregion
 
-        #region Item-related
+        #region Item Commands
         static void DoInv()
         {
             Special("You're carrying:", "yellow");
-            Inv(); // TODO: More big brain
+            Inv();
         }
-        static void Inv(int area = 0)
+        static void Inv(int room = 0) // Player inventory = Room 0
         {
-            int check = 0;
+            bool itemHere = false;
             for (int i = 0;  i < itemPairs.Count; i++)
             {
-                if (itemPairs[i].location == area)
+                if (itemPairs[i].location == room) // Check if item is in the immediate area
                 {
                     Console.WriteLine("A " + itemPairs[i].name);
-                    check++;
+                    itemHere = true;
                 }
             }
-            if (check == 0)
+            if (!itemHere) // No items in room/inventory
             {
-                if (area > 0)
+                if (room > 0)
                 {
                     Console.WriteLine("There's nothing else of interest here.");
                 }
@@ -130,49 +141,42 @@ namespace TextersLab
             Look(lookDefault);
         }
         public static void Look(string[] target) // Look at target
-        {
-            bool check = false;
+        { // TODO: Take into account "Room" AND "Item" both being typed?
+            bool itemHere = false;
             for (int i = 0; i < target.Length; i++)
             {
-                if (check) // TODO: Fix the item description repeating itself so I don't have to do this check.
-                {
-                    break;
-                }
                 switch (target[i])
-                {
+                {   // "Look at room" "Look around" etc.
                     case "room": case "area": case "around":
-                        check = true;
+                        itemHere = true;
                         Inv(player.location);
                         break;
-                    default: // Check if the player typed an item name
+                    default: // Check if the player typed an existing item name
                         for (int j = 0; j < itemPairs.Count; j++)
                         {
                             for (int k = 0; k < target.Length; k++)
                             {
-                                if (itemPairs[j].name == target[k])
+                                if (itemPairs[j].name == target[k] && !itemHere)
                                 {
-                                    check = true;
                                     if (itemPairs[j].location == player.location || itemPairs[j].location == 0)
                                     {
+                                        itemHere = true;
                                         Console.WriteLine("It's " + itemPairs[j].desc);
-                                        break; // Look at one item at a time, hopefully.
+                                        // If multiple items are typed, it will give the earliest occuring item according to the dictionary.
                                     }
-                                    else // Item exists, but is not in the immediate area. TODO: Combine these two "default" messages?
-                                    {
-                                        Console.WriteLine("Don't see anything like that here.");
-                                    }
+                                    break;
                                 }
                             }
                         }
                         break;
-                }
+                } 
             } // Check if the player typed gibberish
-            if (!check)
+            if (!itemHere)
             {
                 Console.WriteLine("Don't see anything like that here.");
             }
         }
-        static void Take(string item)
+        static void Take(string item) // TODO: Have this method search through input array (ex. "Take THE crowbar"). Get rid of exception handling.
         {
             try
             {
@@ -200,27 +204,13 @@ namespace TextersLab
                 Console.WriteLine("Don't see that here.");
             }
         }
-        public static void Items(Dictionary<int, Thing> itemPairs)
-        {
-            // LIST OF ITEMS
-            Thing item1 = new Thing("crowbar", "a bent metal stick", 2, true);
-            Thing item2 = new Thing("crate", "a large wooden box", 1, false);
-
-            // Items by number
-            itemPairs.Add(0, item1);
-            itemPairs.Add(1, item2);
-
-            // Items by name
-            itemNames.Add("crowbar", item1);
-            itemNames.Add("crate", item2);
-        }
         #endregion
 
-        #region Navigation
+        #region Navigation Commands
         static void Go(int dirs) // Moving from room to room
         {
             int newLocation = roomPairs[player.location].directions[dirs];
-            if (newLocation == -1)
+            if (newLocation == NOWHERE)
             {
                 Console.WriteLine("You can't go that way.");
             }
@@ -230,13 +220,13 @@ namespace TextersLab
                 GoLook();
             }
         }
-        static void GoLook() // Navigation only
+        static void GoLook() // Give room description upon entering
         {
             int location = player.location;
             Console.WriteLine($"Location: {roomPairs[location].desc}");
         }
-        static void GoParse(string[] dirs)
-        { // Look for directions in player's input
+        static void GoParse(string[] dirs) // Look for directions in player's input
+        { 
             string parsedDirs = "";
             for (int i = 0; i < dirs.Length ; i++)
             {
@@ -282,6 +272,26 @@ namespace TextersLab
                     break;
             }
         }
+        #endregion
+
+        #region List of All Items and Rooms
+        // TODO: Make a method so that I don't have to type .Add to dictionaries every time...
+
+        public static void Items(Dictionary<int, Thing> itemPairs)
+        {
+            // LIST OF ITEMS
+            Thing item1 = new Thing("crowbar", "a bent metal stick", 2, true);
+            Thing item2 = new Thing("crate", "a large wooden box", 1, false);
+
+            // Items by NUMBER
+            itemPairs.Add(0, item1);
+            itemPairs.Add(1, item2);
+
+            // Items by NAME
+            itemNames.Add("crowbar", item1);
+            itemNames.Add("crate", item2);
+        }
+
         public static void Rooms(Dictionary<int, Room> roomPairs)
         {
             // LIST OF ROOMS
@@ -302,43 +312,38 @@ namespace TextersLab
         #region Visuals
         static void Screen(int selection) // Logo and other art
         {
-            if (selection == 0)
-            {
-                Console.Title = "Texter's Lab";
-                Console.ForegroundColor = ConsoleColor.Blue;
-                string logo = @"
+            switch (selection) {
+                case 0:
+                    Console.Title = "Texter's Lab";
+                    Special(@"
   _____         _            _       _          _      
  |_   _|____  _| |_ ___ _ __( )___  | |    __ _| |__   
    | |/ _ \ \/ / __/ _ \ '__|// __| | |   / _` | '_ \  
    | |  __/>  <| ||  __/ |    \__ \ | |__| (_| | |_) | 
    |_|\___/_/\_\\__\___|_|    |___/ |_____\__,_|_.__/  
-                                                       ";
-                Console.WriteLine(logo);
-                Console.ResetColor();
+                                                       ", "blue");
+                    break;
+                default:
+                    Console.Title = "Placeholder Title";
+                    break;
             }
-            else
-            {
-                Console.Title = "Placeholder Title";
-            }
-
         }
-        static void Special(string prompt, string color = "cyan") // Color text (cyan default) with extra prompt options with red/blue/yellow text
+        static void Special(string prompt, string color = "cyan") // Write a given string with colors Red/Blue/Yellow/Cyan (Default)
         {
-            if (color == "red")
+            switch (color)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-            }
-            else if (color == "blue")
-            {
-                Console.ForegroundColor = ConsoleColor.Blue;
-            }
-            else if (color == "yellow")
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Cyan;
+                case "red":
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
+                case "blue":
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    break;
+                case "yellow":
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    break;
+                default:
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    break;
             }
             Console.WriteLine(prompt);
             Console.ResetColor();
