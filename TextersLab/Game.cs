@@ -49,68 +49,24 @@ namespace TextersLab
             {
                 Console.Write(">");
                 string input = Console.ReadLine().ToLower();
-                GetInput(input);
+                Verb.GetInput(input);
                 Console.WriteLine();
             } while (!winGame);
         }
         #endregion
 
-        #region Keywords
-        static void GetInput(string input) // Determine which command to use
-        { // TODO: Learn regex or XML
-            string[] words = input.Split(' ');
-            if (words.Length > 1)
-            {
-                switch (words[0])
-                {
-                    case "look":
-                    case "check":
-                    case "examine":
-                        Look(words);
-                        break;
-                    case "go":
-                        GoParse(words);
-                        break;
-                    case "take":
-                    case "get":
-                    case "grab":
-                        Take(words[1]);
-                        break;
-                    default:
-                        Console.WriteLine("What?");
-                        break;
-                }
-            }
-            else // Player enters one word only
-            {
-                string[] defaultWords = { "foo", "bar" };
-                switch (words[0])
-                {
-                    case "inventory":
-                    case "inv":
-                        DoInv();
-                        break;
-                    case "look":
-                        Look();
-                        break;
-                    /* case "take":
-                        Take(defaultWords); */
-                    default:
-                        GoParse(words); // Player enters "N" or "North" only
-                        break;
-                }
-            }
-        }
-        #endregion
-
         #region Item Commands
-        static void DoInv()
+        public static void DoInv()
         {
             Special("You're carrying:", "yellow");
             Inv();
         }
         static void Inv(int room = 0) // Player inventory = Room 0
         {
+            if (room != 0)
+            {
+                Console.WriteLine(Room.roomPairs[room].desc);
+            }
             bool itemHere = false;
             for (int i = 0;  i < Item.itemPairs.Count; i++)
             {
@@ -173,33 +129,48 @@ namespace TextersLab
                 Console.WriteLine("Don't see anything like that here.");
             }
         }
-        static void Take(string item) // TODO: Have this method search through input array (ex. "Take THE crowbar"). Get rid of exception handling.
-        {
-            try
+        public static void Take(string[] words)
+        { // TODO: Try foreach
+            bool itemHere = false;
+            for (int i = 0; i < words.Length; i++)
             {
-                Item target = Item.itemNames[item];
-                string itemName = target.name;
-                int itemLocation = target.location;
-                bool itemTake = target.cantake;
+                for (int j = 0; j < Item.itemNames.Count; j++)
+                {
+                    if (Item.itemPairs[j].name == words[i])
+                    {
+                        itemHere = true;
+                        Item item = Item.itemNames[words[i]];
+                        string itemName = item.name;
+                        int itemLocation = item.location;
+                        bool itemTake = item.cantake;
 
-                if (player.location != itemLocation)
-                {
-                    Console.WriteLine("Don't see that here.");
-                }
-                else if (!itemTake)
-                {
-                    Console.WriteLine("Can't carry that!");
-                }
-                else
-                {
-                    target.location = 0;
-                    Special($"Took the {itemName}.", "yellow");
+                        if (player.location != itemLocation)
+                        {
+                            Console.WriteLine("Don't see that here.");
+                            break;
+                        }
+                        else if (!itemTake)
+                        {
+                            Console.WriteLine("Can't carry that!");
+                            break;
+                        }
+                        else
+                        {
+                            item.location = 0;
+                            Special($"Took the {itemName}.", "yellow");
+                            break;
+                        }
+                    }
                 }
             }
-            catch
+            if (!itemHere)
             {
                 Console.WriteLine("Don't see that here.");
             }
+        }
+        public static void Use(string[] input)
+        {
+            // Use x on y
         }
         #endregion
 
@@ -220,9 +191,9 @@ namespace TextersLab
         static void GoLook() // Give room description upon entering
         {
             int location = player.location;
-            Console.WriteLine($"Location: {Room.roomPairs[location].desc}");
+            Console.WriteLine($"Location: {Room.roomPairs[location].name}");
         }
-        static void GoParse(string[] dirs) // Look for directions in player's input
+        public static void GoParse(string[] dirs) // Look for directions in player's input
         { 
             string parsedDirs = "";
             for (int i = 0; i < dirs.Length ; i++)
@@ -275,20 +246,23 @@ namespace TextersLab
         public static void Items()
         {
             // LIST OF ITEMS
-            Item item0 = new Item("crowbar", "a bent metal stick", 2, true);
-            Item item1 = new Item("crate", "a large wooden box", 1, false);
+            _ = new Item("crowbar", "a bent metal stick", 2, true);
+            _ = new Item("crate", "a large wooden box", 1, false);
+            _ = new Item("chest", "a large metal box", NOWHERE, false);
+            _ = new Item("key", "a small metal pick", 2, true);
         }
 
         public static void Rooms()
         {
-            // LIST OF ROOMS
+            // LIST OF ROOMS { N NE E SE S SW W NW U D }
             Room inv = new Room("player inv", "",
             new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
-            Room room1 = new Room("Entrance", "some place",
+            Room entrance1 = new Room("Entrance", "This room is quite lacking in accomdations.",
             new int[] { 2, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
-            Room room2 = new Room("Not Entrance",
-            "some other place",
+            Room hallway2 = new Room("Hallway", "There are some loose items strewn about.",
             new int[] { -1, -1, -1, -1, 1, -1, -1, -1, -1, -1 });
+            Room lockedRoom3 = new Room("Kitchen", "It's eerily clean.", 
+            new int[] { -1, -1, -1, -1, 2, -1, -1, -1, -1, -1 });
         }
         #endregion
 

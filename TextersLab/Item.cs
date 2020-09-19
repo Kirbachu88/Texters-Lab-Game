@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace TextersLab
 {
@@ -24,9 +23,9 @@ namespace TextersLab
             this.itemID = itemCount++;
             itemNames.Add(this.name, this);
             itemPairs.Add(this.itemID, this);
-        } // sort of understanding this.now not really
+        }
 
-        public int getItemCount()
+        public static int getItemCount()
         {
             return itemCount;
         }
