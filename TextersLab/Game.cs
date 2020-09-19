@@ -5,16 +5,13 @@ namespace TextersLab
 {
     public class Game
     {
-        #region List Declaration and Game Conditions
+        #region Locations, Directions, and Game Conditions
         const int NOWHERE = -1;
         const string DIRSLIST =
             "n ne e se s sw w nw up down" +
             "north northeast east southeast south southwest west northwest";
-        static Dictionary<string, Thing> itemNames = new Dictionary<string, Thing>();
-        static Dictionary<int, Thing> itemPairs = new Dictionary<int, Thing>();
-        static Dictionary<int, Room> roomPairs = new Dictionary<int, Room>();
 
-        public static Player player = new Player(1); // Player in starting room
+        static Player player = new Player(1); // Player in starting room
         public static string playerName = "";
         public static bool winGame = false;
         #endregion
@@ -41,8 +38,8 @@ namespace TextersLab
             Console.ReadLine();
             Console.Clear();
 
-            Items(itemPairs);
-            Rooms(roomPairs);
+            Items();
+            Rooms();
             Special("Type in commands and hit ENTER to continue."); // TODO: Make a HELP command
             return playerName;
         }
@@ -115,11 +112,11 @@ namespace TextersLab
         static void Inv(int room = 0) // Player inventory = Room 0
         {
             bool itemHere = false;
-            for (int i = 0;  i < itemPairs.Count; i++)
+            for (int i = 0;  i < Item.itemPairs.Count; i++)
             {
-                if (itemPairs[i].location == room) // Check if item is in the immediate area
+                if (Item.itemPairs[i].location == room) // Check if item is in the immediate area
                 {
-                    Console.WriteLine("A " + itemPairs[i].name);
+                    Console.WriteLine("A " + Item.itemPairs[i].name);
                     itemHere = true;
                 }
             }
@@ -152,16 +149,16 @@ namespace TextersLab
                         Inv(player.location);
                         break;
                     default: // Check if the player typed an existing item name
-                        for (int j = 0; j < itemPairs.Count; j++)
+                        for (int j = 0; j < Item.itemPairs.Count; j++)
                         {
                             for (int k = 0; k < target.Length; k++)
                             {
-                                if (itemPairs[j].name == target[k] && !itemHere)
+                                if (Item.itemPairs[j].name == target[k] && !itemHere)
                                 {
-                                    if (itemPairs[j].location == player.location || itemPairs[j].location == 0)
+                                    if (Item.itemPairs[j].location == player.location || Item.itemPairs[j].location == 0)
                                     {
                                         itemHere = true;
-                                        Console.WriteLine("It's " + itemPairs[j].desc);
+                                        Console.WriteLine("It's " + Item.itemPairs[j].desc);
                                         // If multiple items are typed, it will give the earliest occuring item according to the dictionary.
                                     }
                                     break;
@@ -180,7 +177,7 @@ namespace TextersLab
         {
             try
             {
-                Thing target = itemNames[item];
+                Item target = Item.itemNames[item];
                 string itemName = target.name;
                 int itemLocation = target.location;
                 bool itemTake = target.cantake;
@@ -209,7 +206,7 @@ namespace TextersLab
         #region Navigation Commands
         static void Go(int dirs) // Moving from room to room
         {
-            int newLocation = roomPairs[player.location].directions[dirs];
+            int newLocation = Room.roomPairs[player.location].directions[dirs];
             if (newLocation == NOWHERE)
             {
                 Console.WriteLine("You can't go that way.");
@@ -223,7 +220,7 @@ namespace TextersLab
         static void GoLook() // Give room description upon entering
         {
             int location = player.location;
-            Console.WriteLine($"Location: {roomPairs[location].desc}");
+            Console.WriteLine($"Location: {Room.roomPairs[location].desc}");
         }
         static void GoParse(string[] dirs) // Look for directions in player's input
         { 
@@ -275,24 +272,14 @@ namespace TextersLab
         #endregion
 
         #region List of All Items and Rooms
-        // TODO: Make a method so that I don't have to type .Add to dictionaries every time...
-
-        public static void Items(Dictionary<int, Thing> itemPairs)
+        public static void Items()
         {
             // LIST OF ITEMS
-            Thing item1 = new Thing("crowbar", "a bent metal stick", 2, true);
-            Thing item2 = new Thing("crate", "a large wooden box", 1, false);
-
-            // Items by NUMBER
-            itemPairs.Add(0, item1);
-            itemPairs.Add(1, item2);
-
-            // Items by NAME
-            itemNames.Add("crowbar", item1);
-            itemNames.Add("crate", item2);
+            Item item0 = new Item("crowbar", "a bent metal stick", 2, true);
+            Item item1 = new Item("crate", "a large wooden box", 1, false);
         }
 
-        public static void Rooms(Dictionary<int, Room> roomPairs)
+        public static void Rooms()
         {
             // LIST OF ROOMS
             Room inv = new Room("player inv", "",
@@ -302,10 +289,6 @@ namespace TextersLab
             Room room2 = new Room("Not Entrance",
             "some other place",
             new int[] { -1, -1, -1, -1, 1, -1, -1, -1, -1, -1 });
-
-            roomPairs.Add(0, inv);
-            roomPairs.Add(1, room1);
-            roomPairs.Add(2, room2);
         }
         #endregion
 
