@@ -40,6 +40,7 @@ namespace TextersLab
 
             Items();
             Rooms();
+            Verbs();
             Special("Type in commands and hit ENTER to continue."); // TODO: Make a HELP command
             return playerName;
         }
@@ -49,7 +50,7 @@ namespace TextersLab
             {
                 Console.Write(">");
                 string input = Console.ReadLine().ToLower();
-                Verb.GetInput(input);
+                Verb.ParseInput(input);
                 Console.WriteLine();
             } while (!winGame);
         }
@@ -242,7 +243,7 @@ namespace TextersLab
         }
         #endregion
 
-        #region List of All Items and Rooms
+        #region List of Items/Rooms/Verbs
         public static void Items()
         {
             // LIST OF ITEMS
@@ -263,6 +264,14 @@ namespace TextersLab
             new int[] { -1, -1, -1, -1, 1, -1, -1, -1, -1, -1 });
             Room lockedRoom3 = new Room("Kitchen", "It's eerily clean.", 
             new int[] { -1, -1, -1, -1, 2, -1, -1, -1, -1, -1 });
+        }
+
+        public static void Verbs()
+        {
+            _ = new Verb("look", Look);
+            _ = new Verb("check", Look);
+            _ = new Verb("examine", Look);
+            _ = new Verb("take", Take);
         }
         #endregion
 
