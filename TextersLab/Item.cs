@@ -4,6 +4,7 @@ namespace TextersLab
 {
     public class Item
     {
+        const int NOWHERE = -1;
         public static Dictionary<string, Item> itemNames = new Dictionary<string, Item>();
         public static Dictionary<int, Item> itemPairs = new Dictionary<int, Item>();
 
@@ -28,6 +29,15 @@ namespace TextersLab
         public static int getItemCount()
         {
             return itemCount;
+        }
+
+        public static void ItemList()
+        {
+            // LIST OF ITEMS
+            _ = new Item("crowbar", "a bent metal stick", 2, true);
+            _ = new Item("crate", "a large wooden box", 1, false);
+            _ = new Item("chest", "a large metal box", NOWHERE, false);
+            _ = new Item("key", "a small metal pick", 2, true);
         }
     }
 }
