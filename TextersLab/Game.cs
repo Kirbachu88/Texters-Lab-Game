@@ -50,7 +50,7 @@ namespace TextersLab
             {
                 Console.Write(">");
                 string input = Console.ReadLine().ToLower();
-                Verb.ParseInput(input);
+                Verb.ReadInput(input);
                 Console.WriteLine();
             } while (!winGame);
         }
@@ -176,24 +176,6 @@ namespace TextersLab
         #endregion
 
         #region Navigation Commands
-        static void Go(int dirs) // Moving from room to room
-        {
-            int newLocation = Room.roomPairs[player.location].directions[dirs];
-            if (newLocation == NOWHERE)
-            {
-                Console.WriteLine("You can't go that way.");
-            }
-            else
-            {
-                player.location = newLocation;
-                GoLook();
-            }
-        }
-        static void GoLook() // Give room description upon entering
-        {
-            int location = player.location;
-            Console.WriteLine($"Location: {Room.roomPairs[location].name}");
-        }
         public static void GoParse(string[] dirs) // Look for directions in player's input
         { 
             string parsedDirs = "";
@@ -241,6 +223,24 @@ namespace TextersLab
                     break;
             }
         }
+        static void Go(int dirs) // Moving from room to room
+        {
+            int newLocation = Room.roomPairs[player.location].directions[dirs];
+            if (newLocation == NOWHERE)
+            {
+                Console.WriteLine("You can't go that way.");
+            }
+            else
+            {
+                player.location = newLocation;
+                GoLook();
+            }
+        }
+        static void GoLook() // Give room description upon entering
+        {
+            int location = player.location;
+            Console.WriteLine($"Location: {Room.roomPairs[location].name}");
+        }
         #endregion
 
         #region List of Items/Rooms/Verbs
@@ -259,11 +259,11 @@ namespace TextersLab
             Room inv = new Room("player inv", "",
             new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
             Room entrance1 = new Room("Entrance", "This room is quite lacking in accomdations.",
-            new int[] { 2, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
+            new int[] {  2, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
             Room hallway2 = new Room("Hallway", "There are some loose items strewn about.",
-            new int[] { -1, -1, -1, -1, 1, -1, -1, -1, -1, -1 });
+            new int[] { -1, -1, -1, -1,  1, -1, -1, -1, -1, -1 });
             Room lockedRoom3 = new Room("Kitchen", "It's eerily clean.", 
-            new int[] { -1, -1, -1, -1, 2, -1, -1, -1, -1, -1 });
+            new int[] { -1, -1, -1, -1,  2, -1, -1, -1, -1, -1 });
         }
 
         public static void Verbs()
@@ -272,6 +272,7 @@ namespace TextersLab
             _ = new Verb("check", Look);
             _ = new Verb("examine", Look);
             _ = new Verb("take", Take);
+            _ = new Verb("go", GoParse);
         }
         #endregion
 
