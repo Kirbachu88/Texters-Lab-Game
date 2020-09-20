@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace TextersLab
 {
@@ -10,7 +10,6 @@ namespace TextersLab
         const string DIRSLIST =
             "n ne e se s sw w nw up down" +
             "north northeast east southeast south southwest west northwest";
-
         static Player player = new Player(1); // Player in starting room
         public static string playerName = "";
         public static bool winGame = false;
@@ -40,6 +39,7 @@ namespace TextersLab
 
             Items();
             Rooms();
+            Verbs();
             Special("Type in commands and hit ENTER to continue."); // TODO: Make a HELP command
             return playerName;
         }
@@ -49,14 +49,14 @@ namespace TextersLab
             {
                 Console.Write(">");
                 string input = Console.ReadLine().ToLower();
-                Verb.GetInput(input);
+                Verb.ReadInput(input);
                 Console.WriteLine();
             } while (!winGame);
         }
         #endregion
 
-        #region Item Commands
-        public static void DoInv()
+        #region Inventory
+        public static void DoInv(string[] input)
         {
             Special("You're carrying:", "yellow");
             Inv();
@@ -88,47 +88,9 @@ namespace TextersLab
                 }
             }
         }
-        public static void Look() // If there's no look target, examine room
-        {
-            string[] lookDefault = {"room"};
-            Look(lookDefault);
-        }
-        public static void Look(string[] target) // Look at target
-        { // TODO: Take into account "Room" AND "Item" both being typed?
-            bool itemHere = false;
-            for (int i = 0; i < target.Length; i++)
-            {
-                switch (target[i])
-                {   // "Look at room" "Look around" etc.
-                    case "room": case "area": case "around":
-                        itemHere = true;
-                        Inv(player.location);
-                        break;
-                    default: // Check if the player typed an existing item name
-                        for (int j = 0; j < Item.itemPairs.Count; j++)
-                        {
-                            for (int k = 0; k < target.Length; k++)
-                            {
-                                if (Item.itemPairs[j].name == target[k] && !itemHere)
-                                {
-                                    if (Item.itemPairs[j].location == player.location || Item.itemPairs[j].location == 0)
-                                    {
-                                        itemHere = true;
-                                        Console.WriteLine("It's " + Item.itemPairs[j].desc);
-                                        // If multiple items are typed, it will give the earliest occuring item according to the dictionary.
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-                } 
-            } // Check if the player typed gibberish
-            if (!itemHere)
-            {
-                Console.WriteLine("Don't see anything like that here.");
-            }
-        }
+        #endregion
+
+        #region Item Commands
         public static void Take(string[] words)
         { // TODO: Try foreach
             bool itemHere = false;
@@ -174,25 +136,69 @@ namespace TextersLab
         }
         #endregion
 
-        #region Navigation Commands
-        static void Go(int dirs) // Moving from room to room
+        #region Look
+        public static void Look(string[] input)
         {
-            int newLocation = Room.roomPairs[player.location].directions[dirs];
-            if (newLocation == NOWHERE)
+            if (input.Length == 1)
             {
-                Console.WriteLine("You can't go that way.");
+                LookRoom();
             }
             else
             {
-                player.location = newLocation;
-                GoLook();
+                string target = GetTarget(input);
+                if (target == "")
+                {
+                    LookFail();
+                }
             }
         }
-        static void GoLook() // Give room description upon entering
+        static void LookRoom()
         {
-            int location = player.location;
-            Console.WriteLine($"Location: {Room.roomPairs[location].name}");
+            Inv(player.location);
         }
+        static string GetTarget(string[] input)
+        {
+            string[] area = {"room", "around", "area" };
+            string target = "";
+
+            for (int i = 0; i < input.Length; i++)
+            { // Honestly an unintended consequence is the ability to look at mulitple items at once
+                foreach (var item in Item.itemNames)
+                {
+                    if (Item.itemNames.ContainsKey(input[i])) {
+                        target = input[i];
+                        PrintDesc(target);
+                        break;
+                    }
+                    else if (area.Contains(input[i]))
+                    {
+                        LookRoom();
+                        target = "room";
+                        break;
+                    }
+                }
+            }
+            return target;
+        }
+        static void PrintDesc(string target)
+        { 
+            int itemLocation = Item.itemNames[target].location;
+            if (itemLocation == player.location || itemLocation == 0)
+            {
+                Console.WriteLine("It's " + Item.itemNames[target].desc);
+            }
+            else
+            {
+                LookFail();
+            }
+        }
+        static void LookFail()
+        {
+            Console.WriteLine("Don't see anything like that here...");
+        }
+        #endregion
+
+        #region Navigation
         public static void GoParse(string[] dirs) // Look for directions in player's input
         { 
             string parsedDirs = "";
@@ -240,9 +246,27 @@ namespace TextersLab
                     break;
             }
         }
+        static void Go(int dirs) // Moving from room to room
+        {
+            int newLocation = Room.roomPairs[player.location].directions[dirs];
+            if (newLocation == NOWHERE)
+            {
+                Console.WriteLine("You can't go that way.");
+            }
+            else
+            {
+                player.location = newLocation;
+                GoLook();
+            }
+        }
+        static void GoLook() // Give room description upon entering
+        {
+            int location = player.location;
+            Console.WriteLine($"Location: {Room.roomPairs[location].name}");
+        }
         #endregion
 
-        #region List of All Items and Rooms
+        #region List of Items/Rooms/Verbs
         public static void Items()
         {
             // LIST OF ITEMS
@@ -258,11 +282,25 @@ namespace TextersLab
             Room inv = new Room("player inv", "",
             new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
             Room entrance1 = new Room("Entrance", "This room is quite lacking in accomdations.",
-            new int[] { 2, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
-            Room hallway2 = new Room("Hallway", "There are some loose items strewn about.",
-            new int[] { -1, -1, -1, -1, 1, -1, -1, -1, -1, -1 });
+            new int[] {  2, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
+            Room hallway2 = new Room("Hallway", "Full of clutter, loose items strewn about.",
+            new int[] { -1, -1, -1, -1,  1, -1, -1, -1, -1, -1 });
             Room lockedRoom3 = new Room("Kitchen", "It's eerily clean.", 
-            new int[] { -1, -1, -1, -1, 2, -1, -1, -1, -1, -1 });
+            new int[] { -1, -1, -1, -1,  2, -1, -1, -1, -1, -1 });
+        }
+
+        public static void Verbs()
+        { // Positives, much cleaner, negatives, every method needs to have string[] parameters now
+            _ = new Verb("inventory", DoInv);
+            _ = new Verb("inv", DoInv);
+            _ = new Verb("look", Look);
+            _ = new Verb("check", Look);
+            _ = new Verb("examine", Look);
+            _ = new Verb("take", Take);
+            _ = new Verb("grab", Take);
+            _ = new Verb("get", Take);
+            _ = new Verb("go", GoParse);
+            _ = new Verb("use", Use);
         }
         #endregion
 
