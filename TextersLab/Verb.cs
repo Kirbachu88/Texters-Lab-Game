@@ -17,7 +17,6 @@ namespace TextersLab
         public static void ReadInput(string input)
         {
             string[] splitWords = SplitInput(input);
-            // GetFunction(splitWords[0]);
             CallFunction(splitWords[0], splitWords);
         }
 
@@ -34,7 +33,7 @@ namespace TextersLab
                 verbPairs[methodName](words);
             }
             else
-            { 
+            {
                 verbPairs["go"](words);
                 // Attempt travel by default
                 // Move simply with "N" or "North" etc.
