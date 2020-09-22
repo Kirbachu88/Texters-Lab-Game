@@ -18,7 +18,7 @@ namespace TextersLab
             }
         }
 
-        static void MovePlayer(int dirs) // Moving from room to room
+        private static void MovePlayer(int dirs) // Moving from room to room
         {
             int newLocation = Room.roomPairs[Game.player.location].directions[dirs];
             if (newLocation == NOWHERE)
@@ -31,7 +31,7 @@ namespace TextersLab
                 GoLook();
             }
         }
-        static void GoLook() // Give room description upon entering
+        private static void GoLook() // Give room description upon entering
         {
             int location = Game.player.location;
             Console.WriteLine($"Location: {Room.roomPairs[location].name}");

@@ -3,11 +3,11 @@ using System.Linq;
 
 namespace TextersLab
 {
-    class CmdLook: Game
+    class CmdLook
     {
         public static void LookRoom()
         {
-            CmdInv.PrintInv(player.location);
+            CmdInv.PrintInv(Game.player.location);
         }
         public static string GetTarget(string[] input)
         {
@@ -33,7 +33,7 @@ namespace TextersLab
                     }
                     else if (inv.Contains(input[i]))
                     {
-                        Inv(input);
+                        Game.Inv(input);
                         target = "inv";
                         break;
                     }
@@ -41,16 +41,16 @@ namespace TextersLab
             }
             return target;
         }
-        public static void PrintDesc(string target)
+        private static void PrintDesc(string target)
         {
             int itemLocation = Item.itemNames[target].location;
-            if (itemLocation == player.location || itemLocation == 0)
+            if (itemLocation == Game.player.location || itemLocation == 0)
             {
                 Console.WriteLine("It's " + Item.itemNames[target].desc);
             }
             else
             {
-                FailItem();
+                Game.FailItem();
             }
         }
     }

@@ -21,9 +21,9 @@ namespace TextersLab
             this.desc = desc;
             this.location = location;
             this.cantake = cantake;
-            this.itemID = itemCount++;
-            itemNames.Add(this.name, this);
-            itemPairs.Add(this.itemID, this);
+            itemID = itemCount++;
+            itemNames.Add(name, this);
+            itemPairs.Add(itemID, this);
         }
 
         public static int getItemCount()

@@ -2,7 +2,7 @@
 
 namespace TextersLab
 {
-    class CmdTake : Game
+    class CmdTake
     {
         public static string GetTarget(string[] input)
         {
@@ -21,11 +21,11 @@ namespace TextersLab
             }
             return target;
         }
-        static void CheckItem(Item item)
+        private static void CheckItem(Item item)
         {
-            if (player.location != item.location)
+            if (Game.player.location != item.location)
             {
-                FailItem();
+                Game.FailItem();
             }
             else if (!item.cantake)
             {
@@ -34,7 +34,7 @@ namespace TextersLab
             else
             {
                 item.location = 0;
-                Special($"Took the {item.name}.", "yellow");
+                VFX.Special($"Took the {item.name}.", "yellow");
             }
         }
     }

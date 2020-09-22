@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace TextersLab
 {
-    public class Game: VFX
+    public class Game
     {
         #region Game Conditions
         public static Player player = new Player(1); // Player in starting room
@@ -11,21 +11,28 @@ namespace TextersLab
         public static bool winGame = false;
         #endregion
 
-        #region Gameplay
-        public static string StartGame() // Introduce game and get player's name
+        public static void Initialize()
         {
+            Console.SetWindowSize(55, 25);
+            Combo.ComboList();
             Item.ItemList();
             Room.RoomList();
             Verb.VerbList();
             Direction.DirsList();
 
-            Screen(0);
+            StartGame();
+        }
+
+        #region Gameplay
+        private static void StartGame() // Introduce game and get player's name
+        {
+            VFX.Screen(0);
 
             Console.WriteLine("Welcome! Your mission today is to get to your lab.\nIt would be dangerous to leave it unattended.\nYou find yourself in an unknown series of rooms,\nwith quite a journey ahead.\n\nPress ENTER to continue...");
             Console.ReadLine();
 
             Console.WriteLine("Let's get to know more about you.");
-            Special("What is your name?");
+            VFX.Special("What is your name?");
             playerName = Console.ReadLine();
 
             while (playerName.Length > 30 || playerName.Length == 0)
@@ -38,10 +45,10 @@ namespace TextersLab
             Console.ReadLine();
             Console.Clear();
 
-            Special("Type in commands and hit ENTER to continue."); // TODO: Make a HELP command
-            return playerName;
+            VFX.Special("Type in commands and hit ENTER to continue."); 
+            PlayGame();
         }
-        public static void PlayGame()
+        private static void PlayGame()
         {
             do
             {
@@ -69,7 +76,7 @@ namespace TextersLab
         }
         public static void Inv(string[] input)
         {
-            Special("You're carrying:", "yellow");
+            VFX.Special("You're carrying:", "yellow");
             CmdInv.PrintInv();
         }
         public static void Look(string[] input)
@@ -104,7 +111,15 @@ namespace TextersLab
         }
         public static void Use(string[] input)
         {
-            // Use x on y
+            if (input.Length < 3)
+            {
+                Console.WriteLine("Use what?");
+            }
+            else
+            {
+                int effectID = Combo.ValidCombos.IndexOf(Tuple.Create(input[1], input[2]));
+                Console.WriteLine(effectID);
+            }
         }
 
         public static void FailItem()

@@ -18,8 +18,8 @@ namespace TextersLab
             this.name = name;
             this.desc = desc;
             this.directions = directions;
-            this.roomID = roomCount++;
-            roomPairs.Add(this.roomID, this);
+            roomID = roomCount++;
+            roomPairs.Add(roomID, this);
         }
 
         public int getRoomCount()
