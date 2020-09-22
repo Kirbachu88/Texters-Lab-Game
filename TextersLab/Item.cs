@@ -34,10 +34,10 @@ namespace TextersLab
         public static void ItemList()
         {
             // LIST OF ITEMS
-            _ = new Item("crowbar", "a bent metal stick", 2, true);
-            _ = new Item("crate", "a large wooden box", 1, false);
-            _ = new Item("chest", "a large metal box", NOWHERE, false);
-            _ = new Item("key", "a small metal pick", 2, true);
+            _ = new Item("crowbar", "A bent metal stick", 2, true);
+            _ = new Item("crate", "It's a large sealed wooden box", 1, false);
+            _ = new Item("key", "A small metal pick, but only for one lock.", NOWHERE, true);
+            _ = new Item("door", "Seems to be locked.", 2, false);
         }
     }
 }

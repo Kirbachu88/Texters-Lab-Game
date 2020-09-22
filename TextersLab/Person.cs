@@ -1,10 +1,10 @@
 ﻿namespace TextersLab
 {
-    public class Player
+    public class Person
     {
         public int location;
 
-        public Player(int location)
+        public Person(int location)
         {
             this.location = location;
         }

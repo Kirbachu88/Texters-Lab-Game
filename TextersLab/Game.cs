@@ -6,7 +6,7 @@ namespace TextersLab
     public class Game
     {
         #region Game Conditions
-        public static Player player = new Player(1); // Player in starting room
+        public static Person player = new Person(1); // Player in starting room
         public static string playerName = "";
         public static bool winGame = false;
         #endregion
@@ -117,8 +117,7 @@ namespace TextersLab
             }
             else
             {
-                int effectID = Combo.ValidCombos.IndexOf(Tuple.Create(input[1], input[2]));
-                Console.WriteLine(effectID);
+                CmdUse.GetItems(input);
             }
         }
 

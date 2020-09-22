@@ -46,7 +46,7 @@ namespace TextersLab
             int itemLocation = Item.itemNames[target].location;
             if (itemLocation == Game.player.location || itemLocation == 0)
             {
-                Console.WriteLine("It's " + Item.itemNames[target].desc);
+                Console.WriteLine(Item.itemNames[target].desc);
             }
             else
             {
