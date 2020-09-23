@@ -18,6 +18,10 @@ namespace TextersLab
    |_|\___/_/\_\\__\___|_|    |___/ |_____\__,_|_.__/  
                                                        ", "blue");
                     break;
+                case 10:
+                    Console.Title = "The End";
+                    Special("Congratulations! You beat the demo!");
+                    break;
                 default:
                     Console.Title = "Placeholder Title";
                     break;

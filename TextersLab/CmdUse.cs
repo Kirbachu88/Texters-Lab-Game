@@ -42,7 +42,7 @@ namespace TextersLab
             }
             else
             {
-                Console.WriteLine("Can't do that...");
+                Console.WriteLine("What are you doing?");
             }
         }
 
@@ -56,29 +56,38 @@ namespace TextersLab
         {
             Combo currentEffect = Combo.comboPairs.GetValueOrDefault(effectID);
 
-            if (!currentEffect.effectActivated) // && put bool here
+            if (currentEffect != null)
             {
-                Console.WriteLine(currentEffect.effectDesc);
-                currentEffect.effectActivated = true;
+                if (!currentEffect.effectActivated)
+                {
+                    Console.WriteLine(currentEffect.effectDesc);
+                    currentEffect.effectActivated = true;
 
-                switch (currentEffect.effectName)
-                { // Trying to think of a better way to do this
-                    case "unbox":
-                        Item.GetItemByName("key").location = 1; // TODO make Item retrieval a method
-                        Item.GetItemByName("crate").desc = "It's been pried open.";
-                        break;
-                    case "unlock":
-                        Room.GetRoomByName("Hallway").directions[0] = 3;
-                        Item.GetItemByName("door").desc = "It's open now!";
-                        break;
-                    default:
-                        Console.WriteLine("What?");
-                        break;
+                    switch (currentEffect.effectName)
+                    { // Trying to think of a better way to do this
+                        case "unbox":
+                            Item.GetItemByName("key").location = 1;
+                            Item.GetItemByName("crate").desc = "It's been pried open.";
+                            break;
+                        case "unlock":
+                            Room.GetRoomByName("Hallway").directions[0] = 3;
+                            Item.GetItemByName("door").desc = "It's open now!";
+                            break;
+                        default:
+                            Console.WriteLine("What?");
+                            break;
+                      // I'd really like one for if you try to use the crowbar on random things, without having to do each one individually
+                    }
                 }
+                else
+                {
+                    Console.WriteLine("Already did that!");
+                }
+                
             }
             else
             {
-                Console.WriteLine("Already did that!");
+                Console.WriteLine("That won't do any good.");
             }
         }
     }

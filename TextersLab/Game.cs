@@ -57,7 +57,19 @@ namespace TextersLab
                 string input = Console.ReadLine().ToLower();
                 Verb.ReadInput(input);
                 Console.WriteLine();
+                if (player.location == 3)
+                {
+                    winGame = true;
+                }
             } while (!winGame);
+
+            EndGame();
+        }
+
+        private static void EndGame()
+        {
+            VFX.Screen(10);
+            Console.ReadLine();
         }
         #endregion
 
