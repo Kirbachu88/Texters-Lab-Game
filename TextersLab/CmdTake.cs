@@ -33,7 +33,7 @@ namespace TextersLab
             }
             else
             {
-                item.location = 0;
+                item.location = Game.INVENTORY;
                 VFX.Special($"Took the {item.name}.", "yellow");
             }
         }

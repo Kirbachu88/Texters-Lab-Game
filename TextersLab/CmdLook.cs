@@ -5,10 +5,6 @@ namespace TextersLab
 {
     class CmdLook
     {
-        public static void LookRoom()
-        {
-            CmdInv.PrintInv(Game.player.location);
-        }
         public static string GetTarget(string[] input)
         {
             string[] area = { "room", "around", "area" };
@@ -27,7 +23,7 @@ namespace TextersLab
                     }
                     else if (area.Contains(input[i]))
                     {
-                        LookRoom();
+                        PrintItems(Game.player.location);
                         target = "room";
                         break;
                     }
@@ -41,10 +37,39 @@ namespace TextersLab
             }
             return target;
         }
+
+        public static void PrintItems(int room = Game.INVENTORY)
+        {
+            if (room != 0)
+            {
+                Console.WriteLine(Room.roomPairs[room].desc);
+            }
+            bool itemHere = false;
+            for (int i = 0; i < Item.itemPairs.Count; i++)
+            {
+                if (Item.itemPairs[i].location == room) // Check if item is in the immediate area
+                {
+                    Console.WriteLine("A " + Item.itemPairs[i].name);
+                    itemHere = true;
+                }
+            }
+            if (!itemHere) // No items in room/inventory
+            {
+                if (room > 0)
+                {
+                    Console.WriteLine("There's nothing else of interest here.");
+                }
+                else
+                {
+                    Console.WriteLine("Nothing!");
+                }
+            }
+        }
+
         private static void PrintDesc(string target)
         {
             int itemLocation = Item.itemNames[target].location;
-            if (itemLocation == Game.player.location || itemLocation == 0)
+            if (itemLocation == Game.player.location || itemLocation == Game.INVENTORY)
             {
                 Console.WriteLine(Item.itemNames[target].desc);
             }

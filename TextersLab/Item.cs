@@ -31,6 +31,12 @@ namespace TextersLab
             return itemCount;
         }
 
+        public static Item GetItemByName(string itemName)
+        {
+            Item item = itemNames.GetValueOrDefault(itemName);
+            return item;
+        }
+
         public static void ItemList()
         {
             // LIST OF ITEMS

@@ -8,6 +8,7 @@ namespace TextersLab
         #region Game Conditions
         public static Person player = new Person(1); // Player in starting room
         public static string playerName = "";
+        public const int INVENTORY = 0;
         public static bool winGame = false;
         #endregion
 
@@ -77,13 +78,13 @@ namespace TextersLab
         public static void Inv(string[] input)
         {
             VFX.Special("You're carrying:", "yellow");
-            CmdInv.PrintInv();
+            CmdLook.PrintItems();
         }
         public static void Look(string[] input)
         {
             if (input.Length == 1)
             {
-                CmdLook.LookRoom();
+                CmdLook.PrintItems(Game.player.location);
             }
             else
             {
@@ -111,9 +112,13 @@ namespace TextersLab
         }
         public static void Use(string[] input)
         {
-            if (input.Length < 3)
+            if (input.Length < 2)
             {
                 Console.WriteLine("Use what?");
+            }
+            else if (input.Length < 3)
+            {
+                Console.WriteLine("What do you want to use it on?");
             }
             else
             {

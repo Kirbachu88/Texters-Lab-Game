@@ -5,6 +5,7 @@ namespace TextersLab
     public class Room
     {
         public static Dictionary<int, Room> roomPairs = new Dictionary<int, Room>();
+        public static Dictionary<string, Room> roomNames = new Dictionary<string, Room>();
 
         public const int NDIRS = 10; // N NE E SE S SW W NW UP DOWN
         public string name;
@@ -20,22 +21,29 @@ namespace TextersLab
             this.directions = directions;
             roomID = roomCount++;
             roomPairs.Add(roomID, this);
+            roomNames.Add(name, this);
         }
 
         public int getRoomCount()
         {
             return roomCount;
         }
+
+        public static Room GetRoomByName(string roomName)
+        {
+            Room room = roomNames.GetValueOrDefault(roomName);
+            return room;
+        }
         public static void RoomList()
         {
             // LIST OF ROOMS { N NE E SE S SW W NW U D }
-            Room inv = new Room("player inv", "",
+            _ = new Room("player inventory", "",
             new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
-            Room entrance1 = new Room("Entrance", "This room is quite lacking in accomdations.",
+            _ = new Room("Entrance", "This room is quite lacking in accomdations.",
             new int[] { 2, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
-            Room hallway2 = new Room("Hallway", "Full of clutter, loose items strewn about.",
+            _ = new Room("Hallway", "Full of clutter, loose items strewn about.",
             new int[] { -1, -1, -1, -1, 1, -1, -1, -1, -1, -1 });
-            Room lockedRoom3 = new Room("Kitchen", "It's eerily clean.",
+            _ = new Room("Kitchen", "It's eerily clean.",
             new int[] { -1, -1, -1, -1, 2, -1, -1, -1, -1, -1 });
         }
     }

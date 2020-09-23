@@ -7,7 +7,43 @@ namespace TextersLab
     {
         public static void GetItems(string[] input)
         {
-            GetEffectID("crowbar", "crate");
+            Item[] itemsInInput = new Item[2];
+            for (int i = 0; i < 1; i++)
+            {
+                foreach (var word in input)
+                {
+                    if (Item.itemNames.ContainsKey(word))
+                    {
+                        itemsInInput[i++] = Item.itemNames.GetValueOrDefault(word);
+                    }
+                }
+            }
+
+            if (itemsInInput[0] != null && itemsInInput[1] != null)
+            {
+                CheckItemLocation(itemsInInput[0], itemsInInput[1]);
+            }
+            else
+            {
+                Console.WriteLine("What are you doing?");
+            }
+            
+            // The realization hits me that I can make an array of Items
+        }
+
+        private static void CheckItemLocation(Item item1, Item item2)
+        {
+            bool itemHere1 = item1.location == Game.player.location || item1.location == 0;
+            bool itemHere2 = item2.location == Game.player.location || item2.location == 0;
+
+            if (itemHere1 && itemHere2)
+            {
+                GetEffectID(item1.name, item2.name);
+            }
+            else
+            {
+                Console.WriteLine("Can't do that...");
+            }
         }
 
         private static void GetEffectID(string item1, string item2)
@@ -18,7 +54,32 @@ namespace TextersLab
 
         private static void ActivateEffect(int effectID)
         {
-            Console.WriteLine(Combo.comboPairs.GetValueOrDefault(effectID));
+            Combo currentEffect = Combo.comboPairs.GetValueOrDefault(effectID);
+
+            if (!currentEffect.effectActivated) // && put bool here
+            {
+                Console.WriteLine(currentEffect.effectDesc);
+                currentEffect.effectActivated = true;
+
+                switch (currentEffect.effectName)
+                { // Trying to think of a better way to do this
+                    case "unbox":
+                        Item.GetItemByName("key").location = 1; // TODO make Item retrieval a method
+                        Item.GetItemByName("crate").desc = "It's been pried open.";
+                        break;
+                    case "unlock":
+                        Room.GetRoomByName("Hallway").directions[0] = 3;
+                        Item.GetItemByName("door").desc = "It's open now!";
+                        break;
+                    default:
+                        Console.WriteLine("What?");
+                        break;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Already did that!");
+            }
         }
     }
 }
