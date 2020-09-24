@@ -52,6 +52,7 @@ namespace TextersLab
             _ = new Verb("grab", Take);
             _ = new Verb("get", Take);
             _ = new Verb("use", Use);
+            _ = new Verb("help", Help);
         }
     }
 }

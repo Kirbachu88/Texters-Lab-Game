@@ -46,7 +46,7 @@ namespace TextersLab
             Console.ReadLine();
             Console.Clear();
 
-            VFX.Special("Type in commands and hit ENTER to continue."); 
+            VFX.Special("Type in commands and hit ENTER to continue.\nType HELP for a list of basic commands."); 
             PlayGame();
         }
         private static void PlayGame()
@@ -135,6 +135,53 @@ namespace TextersLab
             else
             {
                 CmdUse.GetItems(input);
+            }
+        }
+
+        public static void Help(string[] input)
+        { // Adding more detailed help dialogue when the player says "Help take?"
+            if (input.Length == 2)
+            {
+                switch (input[1])
+                {
+                    case "go":
+                        Console.WriteLine("\"Go North\"\n" +
+                            "May travel N, NE, E, SE, S, SW, W, NW, Up, Down\n" +
+                            "Writing \"Go\" is not necessary.");
+                        break;
+                    case "look":
+                        Console.WriteLine("\"Look at [item/room/inventory]\"\n" +
+                            "May write \"Look\" with no other words to look at room.");
+                        break;
+                    case "take": case "grab": case "get":
+                        Console.WriteLine("\"Take [item]\"\n" +
+                            "Note: some items are not able to be picked up.");
+                        break;
+                    case "inv": case "inventory":
+                        Console.WriteLine("\"Inv\" or \"Inventory\"\n" +
+                            "Lists out every time you have in your possesion.");
+                        break;
+                    case "use":
+                        Console.WriteLine("\"Use [item] on [some other item]\"\n" +
+                            "Certain items may be used on others for some effect.");
+                        break;
+                    case "help":
+                        Console.WriteLine("\"Help\" will give a list of basic commands.\n" +
+                            "\"Help [command]\" gives more info on specific commands.");
+                        break;
+                    case "me": case "stuck": case "hint":
+                        VFX.Special("Words echoed in your head...\n" + playerName + "!\nRemember to take anything useful\nand use those useful things!", "blue");
+                        break;
+                    default:
+                        VFX.Special("Basic commands:\nGo, Look, Take, Inv, Use");
+                        Console.WriteLine("Type \"Help [command]\" for further information.");
+                        break;
+                }
+            }
+            else
+            {
+                VFX.Special("Basic commands:\nGo, Look, Take, Inv, Use");
+                Console.WriteLine("Type \"Help [command]\" for further information.");
             }
         }
 
